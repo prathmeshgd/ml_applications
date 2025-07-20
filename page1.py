@@ -1,7 +1,5 @@
 import streamlit as st
-from sentence_transformers import SentenceTransformer
 import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
 from huggingface_hub import InferenceClient
 import os
 import plotly.graph_objects as go
