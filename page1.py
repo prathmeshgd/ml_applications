@@ -4,7 +4,7 @@ from huggingface_hub import InferenceClient
 import os
 import plotly.graph_objects as go
 from dotenv import load_dotenv
-
+import time
 
 import os
 load_dotenv()
@@ -56,20 +56,45 @@ def similarity_between_sentences(original_txt,test_txt):
 
     return result[0]
 
-  
+def get_color(score):
+    """Return color based on score using soft border transitions."""
+    if score <= 20:
+        return "#FF4C4C"  # bright red
+    elif score <= 40:
+        return "#FF914D"  # orange-red
+    elif score <= 60:
+        return "#FFD700"  # yellow
+    elif score <= 80:
+        return "#9ACD32"  # yellow-green
+    else:
+        return "#2ECC71"  # green
+
 def display(score):
+    with st.spinner("🔍 Analyzing similarity... Please wait"):
+        time.sleep(1.5)  # Simulated delay (you can remove or adjust this)
+
+    color = get_color(score)
+
     fig = go.Figure(go.Pie(
-    values=[score, 100 - score],
-    hole=0.7,
-    marker_colors=["green", "lightgray"],
-    textinfo="none",))
+        values=[score, 100 - score],
+        hole=0.7,
+        marker_colors=[color, "lightgray"],
+        textinfo="none",
+    ))
 
     fig.update_layout(
         showlegend=False,
-        annotations=[dict(text=f"{score}%", x=0.5, y=0.5, font_size=24, showarrow=False)]
+        annotations=[
+            dict(text=f"{score}%", x=0.5, y=0.5, font_size=26, showarrow=False),
+            dict(
+                text="Similarity Score between Your Texts",
+                x=0.5, y=1.15, xref='paper', yref='paper',
+                font_size=20, showarrow=False
+            )
+        ],
+        margin=dict(t=80, b=0, l=0, r=0)
     )
 
-    #st.write("### Your Score")
     st.plotly_chart(fig, use_container_width=True)
 
 
@@ -89,7 +114,7 @@ if analyze_clicked:
     if original_txt and test_txt:
         if analyze_clicked:
             similarity_score = similarity_between_sentences(original_txt,test_txt)
-            st.markdown("<h2 style='text-align: center; color: #4CAF50;'>🏆 Your Final Score</h2>", unsafe_allow_html=True)
+            st.markdown("<h2 style='text-align: center; color: #4CAF50;'>Context Similirity</h2>", unsafe_allow_html=True)
             _= display(int(similarity_score*100))
 
 
